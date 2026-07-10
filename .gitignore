@@ -1,0 +1,10 @@
+# Còpies de seguretat locals (no s'han de publicar)
+*_backup*.html
+*_backup*.js
+index_backup_pre_sync_*.html
+sw_backup_pre_sync.js
+
+# Cruft del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
