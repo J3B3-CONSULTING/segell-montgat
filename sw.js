@@ -1,7 +1,7 @@
 /* Service worker · Segell de Qualitat del Comerç de Montgat
    Estratègia: cache-first per als recursos de l'app (funciona 100% sense connexió).
    Per actualitzar l'app: pugeu el nou fitxer i incrementeu CACHE (ex. v2 -> v3). */
-const CACHE = 'segell-montgat-v2';
+const CACHE = 'segell-montgat-v3';
 const ASSETS = [
   './',
   './index.html',

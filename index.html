@@ -715,7 +715,8 @@ function buildSegellSvg(r){
   const estrelles=isPrem?'★ ★ ★':(s.segell==='ESTÀNDARD'?'★ ★':'');
   const codi=acredCode(r), venc=venciment(r), today=r.data||new Date().toISOString().slice(0,10);
   const nom=svgEsc((r.nom||'—').toUpperCase());
-  const nomSize=nom.length>26?26:(nom.length>18?32:40);
+  const nomSize=nom.length>34?22:(nom.length>26?26:(nom.length>18?32:40));
+  const nivellSize=Math.max(30,Math.min(48,Math.round(226/(Math.max(1,nivell.length)*0.66))));
   const cx=360, cy=372, R=150;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="720" height="960" viewBox="0 0 720 960" font-family="Calibri,'Segoe UI',Arial,sans-serif">
   <rect x="0" y="0" width="720" height="960" fill="#ffffff"/>
@@ -726,17 +727,12 @@ function buildSegellSvg(r){
   <text x="360" y="152" text-anchor="middle" font-size="22" fill="${accent}" font-weight="bold">del Comerç de Montgat</text>
   <line x1="210" y1="172" x2="510" y2="172" stroke="${accent}" stroke-width="2"/>
   <!-- Emblema circular -->
-  <defs>
-    <path id="arcTop" d="M ${cx-R},${cy} A ${R},${R} 0 0 1 ${cx+R},${cy}"/>
-    <path id="arcBot" d="M ${cx-(R+2)},${cy+4} A ${R+2},${R+2} 0 0 0 ${cx+(R+2)},${cy+4}"/>
-  </defs>
   <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${color}" stroke-width="7"/>
-  <circle cx="${cx}" cy="${cy}" r="${R-14}" fill="none" stroke="${accent}" stroke-width="1.5" stroke-dasharray="3 5"/>
-  <text font-size="22" fill="${color}" font-weight="bold" letter-spacing="2"><textPath href="#arcTop" startOffset="50%" text-anchor="middle">SEGELL DE QUALITAT</textPath></text>
-  <text font-size="18" fill="${color}" font-weight="bold" letter-spacing="2"><textPath href="#arcBot" startOffset="50%" text-anchor="middle">COMERÇ DE MONTGAT</textPath></text>
-  <text x="${cx}" y="${cy-22}" text-anchor="middle" font-size="20" fill="${accent}">${estrelles}</text>
-  <text x="${cx}" y="${cy+14}" text-anchor="middle" font-size="${nivell.length>9?34:46}" fill="${color}" font-weight="800" letter-spacing="1">${nivell}</text>
-  <text x="${cx}" y="${cy+44}" text-anchor="middle" font-size="15" fill="${accent}" font-weight="bold" letter-spacing="3">QUALITAT ACREDITADA</text>
+  <circle cx="${cx}" cy="${cy}" r="${R-12}" fill="none" stroke="${accent}" stroke-width="1.5"/>
+  <circle cx="${cx}" cy="${cy}" r="${R-26}" fill="none" stroke="${accent}" stroke-width="1" stroke-dasharray="2 6" opacity="0.65"/>
+  <text x="${cx}" y="${cy-38}" text-anchor="middle" font-size="26" fill="${accent}" letter-spacing="6">${estrelles}</text>
+  <text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="${nivellSize}" fill="${color}" font-weight="800" letter-spacing="1">${nivell}</text>
+  <text x="${cx}" y="${cy+46}" text-anchor="middle" font-size="15" fill="${accent}" font-weight="bold" letter-spacing="3">QUALITAT ACREDITADA</text>
   <!-- Establiment -->
   <text x="360" y="595" text-anchor="middle" font-size="15" fill="#555" letter-spacing="2">S'ACREDITA QUE L'ESTABLIMENT</text>
   <text x="360" y="640" text-anchor="middle" font-size="${nomSize}" fill="${NAVY}" font-weight="bold">${nom}</text>
