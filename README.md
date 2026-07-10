@@ -13,11 +13,9 @@ Funciona **sense connexió**, és **instal·lable** al mòbil i desa les dades a
 
 ## Ús en línia
 
-Un cop publicada a GitHub Pages, l'adreça serà:
+Publicada a GitHub Pages:
 
-```
-https://<usuari>.github.io/<repositori>/
-```
+**https://albertj3b3.github.io/segell-montgat/**
 
 Obre-la al mòbil i instal·la-la (Android: «Afegir a la pantalla d'inici» o botó «📲 Instal·lar app»; iPhone: Compartir › «Afegir a la pantalla d'inici»).
 
