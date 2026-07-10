@@ -78,6 +78,11 @@ table.db th{background:var(--navy);color:#fff;font-size:12px;}
 .dbtools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
 .dbtools button{font-size:12.5px;padding:7px 11px;border-radius:6px;border:1px solid var(--navy);background:var(--navy);color:#fff;cursor:pointer;font-weight:bold;}
 .dbtools button.sec{background:#fff;color:var(--navy);}
+.cloudpill{display:inline-block;font-size:12px;font-weight:bold;padding:4px 10px;border-radius:20px;}
+.cloudpill.ok{background:#e6f5ec;color:#137a3e;border:1px solid #b8e2c8;}
+.cloudpill.pend{background:#fff5e6;color:#b3720a;border:1px solid #f0d59a;}
+.cloudpill.off{background:#eef0f4;color:#77808f;border:1px solid #d8dde6;}
+.syncdot{font-size:13px;}
 
 /* ===== Segell acreditatiu (modal) ===== */
 #sealPreview svg{width:100%;max-width:300px;height:auto;border:1px solid #e0e5ee;border-radius:8px;}
@@ -158,6 +163,7 @@ table.db th{background:var(--navy);color:#fff;font-size:12px;}
       <button onclick="desarBBDD()">💾 Desar a la base de dades</button>
       <button onclick="exportCSV()">⬇ Exportar base de dades (CSV)</button>
       <button onclick="obrirRepositori()">🗄 Base de dades (repositori)</button>
+      <button onclick="obrirNuvol()">☁ Base de dades al núvol</button>
       <button onclick="desarJSON()">⤓ Desar inspecció (JSON)</button>
       <button onclick="document.getElementById('imp').click()">⤒ Carregar inspecció (JSON)</button>
       <input id="imp" type="file" accept="application/json" style="display:none" onchange="carregarJSON(event)">
@@ -195,6 +201,7 @@ table.db th{background:var(--navy);color:#fff;font-size:12px;}
       <button class="btn sec" id="btnSegell" onclick="obrirSegell()">🏅 Descarregar segell acreditatiu</button>
       <button class="btn primary" onclick="desarBBDD()">💾 Desar a la base de dades</button>
       <div class="dbinfo" id="dbinfo"></div>
+      <div class="dbinfo" id="cloudStatus" style="margin-top:4px"></div>
       <div class="small">El segell s'atorga segons l'article 6 dels criteris reguladors: <b>100%</b> dels obligatoris; <b>70%</b> dels estàndard (segell Estàndard); i <b>70%</b> dels premium (segell Premium). Els ítems marcats «No aplica» s'exclouen del càlcul.</div>
     </div>
   </div>
@@ -233,14 +240,38 @@ table.db th{background:var(--navy);color:#fff;font-size:12px;}
     <button class="close" onclick="tancarRepositori()">×</button>
     <h2>Base de dades d'inspeccions</h2>
     <div class="small" id="repoInfo"></div>
+    <div id="repoCloud" style="margin:8px 0"></div>
     <div id="repoTable"></div>
     <div class="dbtools">
+      <button onclick="syncPending(false)">☁ Sincronitzar ara (pujar al núvol)</button>
+      <button class="sec" onclick="pullCloud()">⬇ Baixar del núvol</button>
       <button onclick="exportCSV()">⬇ Exportar a CSV (full de càlcul)</button>
       <button onclick="backupJSON()">💽 Còpia de seguretat completa (JSON)</button>
       <button class="sec" onclick="document.getElementById('restore').click()">♻ Restaurar còpia (JSON)</button>
       <input id="restore" type="file" accept="application/json" style="display:none" onchange="restoreJSON(event)">
     </div>
-    <div class="small" style="margin-top:10px">La base de dades es desa en aquest dispositiu i navegador. Feu còpies de seguretat periòdiques (botó JSON) i deseu-les en una carpeta de l'ajuntament.</div>
+    <div class="small" style="margin-top:10px">Cada inspecció es desa en aquest dispositiu i es <b>puja automàticament</b> a la base de dades central al núvol quan hi ha connexió. Feu també <b>còpies de seguretat</b> periòdiques (botó JSON).</div>
+  </div>
+</div>
+
+<!-- Modal de configuració de la base de dades al núvol -->
+<div class="modal" id="nuvol">
+  <div class="box" style="max-width:560px">
+    <button class="close" onclick="tancarNuvol()">×</button>
+    <h2>Base de dades al núvol</h2>
+    <div class="small">Les inspeccions es desen sempre en aquest dispositiu i, a més, es <b>pugen automàticament</b> a una base de dades central compartida (un full de càlcul de Google) quan hi ha connexió. Introduïu el <b>codi d'accés</b> que us hagi facilitat l'ajuntament.</div>
+    <div id="cloudStatus2" style="margin:10px 0"></div>
+    <div style="display:grid;grid-template-columns:1fr;gap:8px;margin-top:6px">
+      <div><label class="f">Adreça del servei (URL)</label><input type="text" id="cfgUrl" placeholder="https://script.google.com/.../exec"></div>
+      <div><label class="f">Codi d'accés</label><input type="text" id="cfgCode" placeholder="El codi facilitat per l'ajuntament"></div>
+    </div>
+    <div class="dbtools">
+      <button onclick="desarNuvolConfig()">💾 Desar configuració</button>
+      <button class="sec" onclick="provarNuvol()">🔌 Provar connexió</button>
+      <button onclick="syncPending(false)">☁ Sincronitzar ara</button>
+      <button class="sec" onclick="pullCloud()">⬇ Baixar del núvol</button>
+    </div>
+    <div class="small" style="margin-top:10px">El codi es desa en aquest dispositiu. La base de dades central és propietat de l'ajuntament. Sense connexió, les inspeccions es pujaran soles quan torneu a tenir internet.</div>
   </div>
 </div>
 
@@ -424,6 +455,81 @@ function loadDB(){try{return JSON.parse(localStorage.getItem(DBKEY)||'[]');}catc
 function saveDB(db){localStorage.setItem(DBKEY,JSON.stringify(db));}
 function refreshDbInfo(){const db=loadDB();document.getElementById('dbinfo').textContent=`Base de dades: ${db.length} inspeccions desades en aquest dispositiu.`;}
 
+/* ============ SINCRONITZACIÓ AL NÚVOL (Google Sheet via Apps Script) ============ */
+const CLOUD_URL_DEFAULT=''; /* S'omple amb la URL /exec del desplegament d'Apps Script */
+function cloudUrl(){return (localStorage.getItem('montgat_cloud_url')||CLOUD_URL_DEFAULT).trim();}
+function cloudCode(){return (localStorage.getItem('montgat_cloud_code')||'').trim();}
+function cloudConfigured(){return !!cloudUrl();}
+function setCloudConfig(url,code){localStorage.setItem('montgat_cloud_url',(url||'').trim());localStorage.setItem('montgat_cloud_code',(code||'').trim());}
+function genId(){return 'i_'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
+function pendingCount(){return loadDB().filter(r=>!r.synced).length;}
+
+function _cloudPillHtml(){
+  if(!cloudConfigured())return '<span class="cloudpill off">☁ Núvol no configurat — obriu «☁ Base de dades al núvol»</span>';
+  const p=pendingCount();
+  if(!navigator.onLine)return '<span class="cloudpill pend">⚠ Sense connexió'+(p?(' · '+p+' pendents de pujar'):'')+'</span>';
+  return p?('<span class="cloudpill pend">☁ '+p+' pendents de pujar al núvol</span>'):'<span class="cloudpill ok">✓ Tot sincronitzat al núvol</span>';
+}
+function updateCloudStatus(){['cloudStatus','cloudStatus2','repoCloud'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=_cloudPillHtml();});}
+
+async function pushRecord(r){
+  const url=cloudUrl(); if(!url) throw new Error('Núvol no configurat');
+  const res=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({code:cloudCode(),record:r})});
+  const data=await res.json();
+  if(!data||data.ok!==true) throw new Error((data&&data.error)||'Error del servidor');
+  return data;
+}
+
+async function syncPending(silent){
+  if(!cloudConfigured()){if(!silent)alert('Primer configureu la base de dades al núvol (URL i codi d\'accés).');return;}
+  if(!navigator.onLine){updateCloudStatus();if(!silent)alert('Sense connexió. Les inspeccions es pujaran automàticament quan torneu a tenir internet.');return;}
+  let db=loadDB(); const pend=db.filter(r=>!r.synced);
+  if(!pend.length){updateCloudStatus();if(!silent)alert('Tot sincronitzat. No hi ha res pendent de pujar.');return;}
+  let ok=0,fail=0;
+  for(const r of pend){
+    if(!r.id)r.id=genId();
+    try{
+      await pushRecord(r);
+      db=loadDB();
+      const j=db.findIndex(x=>(x.id&&x.id===r.id)||(x.nom===r.nom&&x.data===r.data));
+      if(j>=0){db[j].id=r.id;db[j].synced=true;db[j].syncedAt=new Date().toISOString();saveDB(db);}
+      ok++;
+    }catch(e){fail++;}
+  }
+  updateCloudStatus();refreshDbInfo();
+  const rp=document.getElementById('repo');if(rp&&rp.classList.contains('open'))renderRepo();
+  if(!silent)alert('Sincronització completada: '+ok+' pujada/es'+(fail?', '+fail+' pendent/s (es reintentaran)':'')+'.');
+}
+
+async function pullCloud(){
+  if(!cloudConfigured()){alert('Primer configureu la base de dades al núvol.');return;}
+  if(!navigator.onLine){alert('Sense connexió.');return;}
+  try{
+    const u=cloudUrl()+(cloudUrl().includes('?')?'&':'?')+'action=list&code='+encodeURIComponent(cloudCode());
+    const res=await fetch(u);const data=await res.json();
+    if(!data||data.ok!==true)throw new Error((data&&data.error)||'Error');
+    const arr=data.records||[];const db=loadDB();let add=0,upd=0;
+    arr.forEach(r=>{r.synced=true;const j=db.findIndex(x=>(r.id&&x.id===r.id)||(x.nom===r.nom&&x.data===r.data));if(j>=0){db[j]=Object.assign({},db[j],r);upd++;}else{db.push(r);add++;}});
+    saveDB(db);refreshDbInfo();updateCloudStatus();
+    const rp=document.getElementById('repo');if(rp&&rp.classList.contains('open'))renderRepo();
+    alert('Descàrrega del núvol completada: '+add+' noves, '+upd+' actualitzades.');
+  }catch(e){alert('No s\'ha pogut descarregar del núvol. Reviseu la URL i el codi. Detall: '+e.message);}
+}
+
+async function provarNuvol(){
+  const url=(document.getElementById('cfgUrl').value||'').trim();
+  if(!url){alert('Introduïu primer l\'adreça del servei (URL).');return;}
+  try{
+    const res=await fetch(url+(url.includes('?')?'&':'?')+'ping=1');const data=await res.json();
+    if(data&&data.ok)alert('Connexió correcta ✓  ('+(data.count!=null?data.count+' inspeccions al núvol':'servei actiu')+')');
+    else alert('El servei ha respost amb error: '+((data&&data.error)||'desconegut'));
+  }catch(e){alert('No s\'ha pogut connectar. Reviseu que la URL acabi en /exec i que el desplegament permeti l\'accés a «Qualsevol». Detall: '+e.message);}
+}
+
+function obrirNuvol(){document.getElementById('cfgUrl').value=cloudUrl();document.getElementById('cfgCode').value=cloudCode();updateCloudStatus();document.getElementById('nuvol').classList.add('open');}
+function tancarNuvol(){document.getElementById('nuvol').classList.remove('open');}
+function desarNuvolConfig(){setCloudConfig(document.getElementById('cfgUrl').value,document.getElementById('cfgCode').value);updateCloudStatus();alert('Configuració desada en aquest dispositiu.');syncPending(true);}
+
 function currentRecord(){
   const s=score();
   const resp={},obs={};
@@ -443,10 +549,19 @@ function desarBBDD(){
   if(!r.nom){alert('Indiqueu el nom comercial abans de desar.');return;}
   const db=loadDB();
   const i=db.findIndex(x=>x.nom===r.nom && x.data===r.data);
-  if(i>=0){if(!confirm('Ja existeix una inspecció d\'aquest establiment en aquesta data. Voleu sobreescriure-la?'))return;db[i]=r;}
-  else db.push(r);
-  saveDB(db);refreshDbInfo();
-  alert('Inspecció desada a la base de dades ('+db.length+' en total).');
+  if(i>=0){if(!confirm('Ja existeix una inspecció d\'aquest establiment en aquesta data. Voleu sobreescriure-la?'))return;r.id=db[i].id||genId();db[i]=r;}
+  else {r.id=genId();db.push(r);}
+  r.synced=false;
+  saveDB(db);refreshDbInfo();updateCloudStatus();
+  if(cloudConfigured()){
+    syncPending(true).then(()=>{
+      const p=pendingCount();
+      alert(p? 'Inspecció desada en aquest dispositiu.\nEncara pendent de pujar al núvol (es reintentarà automàticament quan hi hagi connexió).'
+             : 'Inspecció desada i pujada al núvol correctament ('+loadDB().length+' al dispositiu).');
+    });
+  } else {
+    alert('Inspecció desada en aquest dispositiu ('+db.length+' en total).\n\nConsell: configureu «☁ Base de dades al núvol» perquè es pugi a la base de dades central.');
+  }
 }
 
 function exportCSV(){
@@ -668,13 +783,16 @@ function obrirRepositori(){renderRepo();document.getElementById('repo').classLis
 function tancarRepositori(){document.getElementById('repo').classList.remove('open');}
 function renderRepo(){
   const db=loadDB();
+  updateCloudStatus();
   document.getElementById('repoInfo').textContent=db.length+' inspeccions desades en aquest dispositiu.';
   if(!db.length){document.getElementById('repoTable').innerHTML='<p style="color:#888">Encara no hi ha cap inspecció. Empleneu una inspecció i premeu «Desar a la base de dades».</p>';return;}
-  let h='<table class="db"><tr><th>#</th><th>Establiment</th><th>Data</th><th>Sector</th><th>Segell</th><th>Accions</th></tr>';
+  let h='<table class="db"><tr><th>#</th><th>Establiment</th><th>Data</th><th>Sector</th><th>Segell</th><th>Núvol</th><th>Accions</th></tr>';
   db.forEach((r,i)=>{
     const cls=r.segell==='PREMIUM'?'prem':(r.segell==='ESTÀNDARD'?'std':'none');
+    const sync=r.synced?'<span class="syncdot" title="Pujada al núvol">✓</span>':'<span class="syncdot" title="Pendent de pujar">⏳</span>';
     h+=`<tr><td>${i+1}</td><td>${r.nom||'—'}</td><td>${r.data||'—'}</td><td>${r.sector||'—'}</td>
       <td><span class="pill ${cls}">${r.segell}</span></td>
+      <td style="text-align:center">${sync}</td>
       <td><button class="act" onclick="repoObrir(${i})">Obrir</button>
           <button class="act" onclick="repoWord(${i})">Word</button>
           <button class="act" onclick="repoPDF(${i})">PDF</button>
@@ -841,6 +959,11 @@ if('serviceWorker' in navigator){
 /* init */
 document.getElementById('m_data').value=new Date().toISOString().slice(0,10);
 recalc();
+/* núvol: estat inicial, auto-sincronització en arrencar i en recuperar la connexió */
+window.addEventListener('online',()=>{updateCloudStatus();syncPending(true);});
+window.addEventListener('offline',updateCloudStatus);
+updateCloudStatus();
+if(cloudConfigured())syncPending(true);
 </script>
 </body>
 </html>
