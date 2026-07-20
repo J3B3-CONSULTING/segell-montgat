@@ -3,7 +3,7 @@
 Aquesta carpeta és l'aplicació web completa, **instal·lable** i que **funciona sense connexió**.
 Conté:
 
-- `index.html` — l'aplicació (inspecció + segell + informes)
+- `index.html` — l'aplicació (verificació + segell + informes)
 - `manifest.webmanifest` — fa que sigui instal·lable com una app
 - `sw.js` — service worker (memòria cau offline)
 - `icon-*.png`, `apple-touch-icon.png`, `favicon.png` — icones
@@ -53,9 +53,9 @@ Després obre al navegador del **mateix PC**: `http://localhost:8080/`
 
 ## Important sobre les dades
 
-- Les inspeccions es desen **dins del navegador d'aquell dispositiu** (no al núvol, no es comparteixen entre aparells).
+- Les verificacions es desen **dins del navegador d'aquell dispositiu** (no al núvol, no es comparteixen entre aparells).
 - Feu **còpies de seguretat periòdiques**: botó **“Còpia de seguretat completa (JSON)”** dins “Base de dades (repositori)”, i **“Exportar (CSV)”** per al full de càlcul. Deseu-les a la carpeta de l'ajuntament — aquest és l'arxiu definitiu.
-- No useu mode incògnit (s'esborra en tancar) ni “esborrar dades de navegació” (esborra les inspeccions).
+- No useu mode incògnit (s'esborra en tancar) ni “esborrar dades de navegació” (esborra les verificacions).
 
 ## Actualitzar l'app més endavant
 

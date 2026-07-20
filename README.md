@@ -1,6 +1,6 @@
 # Segell de Qualitat del Comerç de Montgat
 
-Aplicació web (PWA) d'inspecció per a l'atorgament del **Segell de qualitat del comerç de Montgat**.
+Aplicació web (PWA) de verificació per a l'atorgament del **Segell de qualitat del comerç de Montgat**.
 Funciona **sense connexió**, és **instal·lable** al mòbil i desa les dades al propi dispositiu.
 
 ## Què fa
@@ -27,7 +27,7 @@ Vegeu [`LLEGEIX-ME.md`](LLEGEIX-ME.md) per a les instruccions completes de publi
 
 | Fitxer | Descripció |
 |---|---|
-| `index.html` | L'aplicació (inspecció + segell + informes) |
+| `index.html` | L'aplicació (verificació + segell + informes) |
 | `manifest.webmanifest` | Fa que sigui instal·lable com a app |
 | `sw.js` | Service worker (memòria cau offline) |
 | `icon-*.png`, `apple-touch-icon.png`, `favicon.png` | Icones |

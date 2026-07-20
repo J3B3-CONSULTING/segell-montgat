@@ -1,7 +1,7 @@
 {
   "name": "Segell de Qualitat del Comerç de Montgat",
   "short_name": "Segell Montgat",
-  "description": "Eina de camp per a la inspecció i acreditació del segell de qualitat del comerç de Montgat. Funciona sense connexió.",
+  "description": "Eina de camp per a la verificació i acreditació del segell de qualitat del comerç de Montgat. Funciona sense connexió.",
   "lang": "ca",
   "start_url": "./index.html",
   "scope": "./",
