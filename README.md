@@ -15,7 +15,7 @@ Funciona **sense connexió**, és **instal·lable** al mòbil i desa les dades a
 
 Publicada a GitHub Pages:
 
-**https://albertj3b3.github.io/segell-montgat/**
+**https://j3b3-consulting.github.io/segell-montgat/**
 
 Obre-la al mòbil i instal·la-la (Android: «Afegir a la pantalla d'inici» o botó «📲 Instal·lar app»; iPhone: Compartir › «Afegir a la pantalla d'inici»).
 
